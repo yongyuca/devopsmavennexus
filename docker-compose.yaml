@@ -1,0 +1,49 @@
+version: "3.7"
+
+services:
+  nexus:
+    image: sonatype/nexus3
+    volumes:
+      - "nexus-data:/nexus-data"
+    ports:
+      - "8081:8081"
+  jenkins:
+    build:
+      context: .
+      dockerfile: jenkinsplugin.Dockerfile
+    user: root
+    privileged: true
+    ports:
+      - '8080:8080'
+      - '50000:50000'
+    environment:
+      # Please update JENKINS_PASSWORD and JENKINS_USERNAME in .env file
+      - JENKINS_USER=root
+      - TZ=America/Toronto
+      - JENKINS_ADMIN_ID=$JENKINS_USERNAME
+      - JENKINS_ADMIN_PASSWORD=$JENKINS_PASSWORD
+    volumes:
+      - 'jenkins_data:/var/jenkins_home'
+      - '/usr/bin/docker:/usr/bin/docker'
+      - '/var/run/docker.sock:/var/run/docker.sock'
+  tomcat:
+    image: tomcat:8.5-jdk15-openjdk-oracle
+    restart: always
+    container_name: tomcat
+    hostname: tomcat
+    ports:
+     - '80:8080'
+    user: root
+    environment:
+      - TOMCAT_USERNAME=yong
+      - TOMCAT_PASSWORD=123456
+      - TOMCAT_ALLOW_REMOTE_MANAGEMENT=yes
+    volumes:
+     - /etc/localtime:/etc/localtime
+     - ./webapps:/usr/local/tomcat/webapps
+     - ./logs:/usr/local/tomcat/logs
+volumes:
+  nexus-data:
+    driver: local
+  jenkins_data:
+    driver: local
