@@ -14,7 +14,7 @@ pipeline {
       stage("Clone code from VCS") {
           steps {
               git branch: 'main',
-                  url: 'https://github.com/chance2021/devopsdaydayup.git'
+                  url: 'https://github.com/yongyuca/devopsmavennexus.git'
               sh "pwd"
               sh "ls -lat"
           }
@@ -22,10 +22,10 @@ pipeline {
       stage("Maven Build") {
           steps {
               script {
-                  sh "cd 006-NexusJenkinsVagrantCICD"
+                //   sh "cd 006-NexusJenkinsVagrantCICD"
                   sh "ls"
                   sh "pwd"
-                  sh "cd 006-NexusJenkinsVagrantCICD && mvn clean package -DskipTests=true"
+                  sh "mvn clean package -DskipTests=true"
                   sh "pwd"
                   sh "ls"
               }
@@ -34,8 +34,8 @@ pipeline {
       stage("Publish to Nexus Repository Manager") {
           steps {
               script {
-                  pom = readMavenPom file: "006-NexusJenkinsVagrantCICD/pom.xml";
-                  filesByGlob = findFiles(glob: "006-NexusJenkinsVagrantCICD/target/*.${pom.packaging}");
+                  pom = readMavenPom file: "pom.xml";
+                  filesByGlob = findFiles(glob: "target/*.${pom.packaging}");
                   echo "${filesByGlob[0].name} ${filesByGlob[0].path} ${filesByGlob[0].directory} ${filesByGlob[0].length} ${filesByGlob[0].lastModified}"
                   artifactPath = filesByGlob[0].path;
                   artifactExists = fileExists artifactPath;
@@ -56,7 +56,7 @@ pipeline {
                               type: pom.packaging],
                               [artifactId: pom.artifactId,
                               classifier: '',
-                              file: "006-NexusJenkinsVagrantCICD/pom.xml",
+                              file: "pom.xml",
                               type: "pom"]
                           ]
                       );
